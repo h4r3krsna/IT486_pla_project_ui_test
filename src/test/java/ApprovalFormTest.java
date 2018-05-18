@@ -28,7 +28,7 @@ public class ApprovalFormTest {
   @Test
   public void sidVerification(){
     WebElement element = webDriver.findElement(By.id("student-id"));
-    assertEquals("123456789", element.getAttribute("innerHTML"));
+    assertEquals("123456789", element.getAttribute("value"));
   }
 
   @After

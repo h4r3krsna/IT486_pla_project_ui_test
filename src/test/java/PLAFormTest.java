@@ -81,10 +81,9 @@ public class PLAFormTest {
 
     (new WebDriverWait(webDriver, 10)).until(new ExpectedCondition<Boolean>() {
       public Boolean apply(WebDriver webDriver) {
-        WebElement confirmationFromServer = webDriver.findElement(By.name("body"));
-        String confirmationMessage = confirmationFromServer.getAttribute("innerHTML");
-        assertTrue(confirmationMessage.contains(expectedConfirmation));
-        return confirmationMessage.contains(expectedConfirmation);
+        String entryViewLinkText = webDriver.findElement(By.tagName("a")).getText();
+        assertEquals("Click Here", entryViewLinkText);
+        return entryViewLinkText.equals("Click Here");
       }
 
       });
