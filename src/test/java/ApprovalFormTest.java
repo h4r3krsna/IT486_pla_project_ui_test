@@ -25,6 +25,8 @@ public class ApprovalFormTest {
     webDriver = new FirefoxDriver();
     webDriver.manage().window().maximize();
     webDriver.get("http://msreedaran.greenrivertech.net/plaform/entries/1");
+
+    // TODO: create a test class that tests with authentication done in @Before
   }
 
   @Test

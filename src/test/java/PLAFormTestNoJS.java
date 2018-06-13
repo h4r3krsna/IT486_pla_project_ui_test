@@ -1,7 +1,10 @@
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -10,30 +13,25 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 
-public class PLAFormTest {
+public class PLAFormTestNoJS {
 
   public static final String GECKO_DRIVER_PATH = "D:\\Dev\\sandbox\\IT485\\geckodriver.exe";
   WebDriver webDriver;
-
-  final String EXPECTED_CONFIRMATION = "Thank you for your submission!";
 
   @Before
   public void goToStudentForm() {
 
     System.setProperty("webdriver.gecko.driver", GECKO_DRIVER_PATH);
 
-    webDriver = new FirefoxDriver();
+    FirefoxOptions options = new FirefoxOptions();
+    options.addPreference("javascript.enabled", false);
+
+    webDriver = new FirefoxDriver(options);
     webDriver.manage().window().maximize();
     webDriver.get("http://msreedaran.greenrivertech.net/plaform");
-  }
-
-  @Test
-  public void pageTitleVerification() {
-    WebElement element = webDriver.findElement(By.tagName("h1"));
-    assertEquals("Prior Learning Assessment Request Form", element.getAttribute("innerHTML"));
   }
 
   private void fillFormWithValidDefaults(WebDriver webDriver) {
@@ -104,13 +102,14 @@ public class PLAFormTest {
 
     webDriver.findElement(By.name("reflection4")).submit();
 
+    final String expectedConfirmation = "Thank you for your submission!";
 
     (new WebDriverWait(webDriver, 10)).until(new ExpectedCondition<Boolean>() {
       public Boolean apply(WebDriver webDriver) {
         boolean submissionConfirmed = false;
         try {
           String confirmationText = webDriver.findElement(By.id("confirmation")).getText();
-          submissionConfirmed = confirmationText.contains(EXPECTED_CONFIRMATION);
+          submissionConfirmed = confirmationText.contains(expectedConfirmation);
         } catch (NoSuchElementException exn) {
           System.err.println(exn.getMessage());
         } finally {
@@ -124,13 +123,16 @@ public class PLAFormTest {
   @Test
   public void blankFormSubmissionTest() {
     webDriver.findElement(By.name("student-id")).submit();
-    WebElement confirmation = null;
-    try {
-      confirmation = webDriver.findElement(By.id("confirmation"));
-    } catch (NoSuchElementException exn) { // is this necessary?
-      System.err.println(exn.getMessage());
+    List<WebElement> validationErrors = null;
+    try { // TODO: replace with WebDriver wait
+      Thread.sleep(10000);
+      validationErrors = webDriver.findElements(By.className("validationError"));
+    } catch (InterruptedException exn) {
+      System.err.println(exn.getMessage() + "\nBlank Form Submission Test thread interrupted!");
+    } catch (NoSuchElementException exn) {
+      System.err.println("No elements found with the class name \"validationError\"");
     } finally {
-      assertNull(confirmation);
+      assertNotNull(validationErrors);
     }
   }
 
@@ -148,22 +150,21 @@ public class PLAFormTest {
 
     webDriver.findElement(By.name("reflection4")).submit();
 
-    WebElement confirmation = null;
-    try {
-      confirmation = webDriver.findElement(By.id("confirmation"));
-    } catch(UnhandledAlertException exn) {
-      try {
-        Alert alert = webDriver.switchTo().alert();
-        String alertText = alert.getText();
-        assertEquals(alertText, "Please ensure that Start Date is on or before End Date!");
-        alert.accept();
-      } catch (NoAlertPresentException e) {
-        e.printStackTrace();
+    final String expectedError = "(must be on/before End Date)";
+    boolean foundExpectedError = false;
+
+    try { // TODO: replace with WebDriver wait
+      Thread.sleep(10000);
+      List<WebElement> validationErrors = webDriver.findElements(By.className("validationError"));
+      for (WebElement validationError : validationErrors) {
+        foundExpectedError = foundExpectedError || validationError.getText().contains(expectedError);
       }
-    } catch (NoSuchElementException exn) { // is this necessary?
-      System.err.println(exn.getMessage());
+    } catch (InterruptedException exn) {
+      System.err.println(exn.getMessage() + " \nInvalid Date Test thread interrupted");
+    } catch (NoSuchElementException exn) {
+      System.err.println("No elements found with the class name \"validationError\"");
     } finally {
-      assertNull(confirmation);
+      assertTrue(foundExpectedError);
     }
   }
 
