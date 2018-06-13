@@ -11,6 +11,7 @@ import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 
 public class PLAFormTest {
@@ -104,21 +105,33 @@ public class PLAFormTest {
 
     webDriver.findElement(By.name("reflection4")).submit();
 
+    boolean submissionConfirmed = false;
 
-    (new WebDriverWait(webDriver, 10)).until(new ExpectedCondition<Boolean>() {
-      public Boolean apply(WebDriver webDriver) {
-        boolean submissionConfirmed = false;
-        try {
-          String confirmationText = webDriver.findElement(By.id("confirmation")).getText();
-          submissionConfirmed = confirmationText.contains(EXPECTED_CONFIRMATION);
-        } catch (NoSuchElementException exn) {
-          System.err.println(exn.getMessage());
-        } finally {
-          assertTrue(submissionConfirmed);
-          return submissionConfirmed;
-        }
-      }
-    });
+    try {
+      Thread.sleep(10000);
+      submissionConfirmed = webDriver.findElement(By.id("confirmation")).getText().contains(EXPECTED_CONFIRMATION);
+    } catch (InterruptedException exn) {
+      System.err.println(exn.getMessage() + "\nBlank Form Submission Test thread interrupted!");
+    } catch (NoSuchElementException exn) {
+      System.err.println("No elements found with the class name \"validationError\"");
+    } finally {
+      assertTrue(submissionConfirmed);
+    }
+
+//    (new WebDriverWait(webDriver, 10)).until(new ExpectedCondition<Boolean>() {
+//      public Boolean apply(WebDriver webDriver) {
+//        boolean submissionConfirmed = false;
+//        try {
+//          String confirmationText = webDriver.findElement(By.id("confirmation")).getText();
+//          submissionConfirmed = confirmationText.contains(EXPECTED_CONFIRMATION);
+//        } catch (NoSuchElementException exn) {
+//          System.err.println(exn.getMessage());
+//        } finally {
+//          assertTrue(submissionConfirmed);
+//          return submissionConfirmed;
+//        }
+//      }
+//    });
   }
 
   @Test
