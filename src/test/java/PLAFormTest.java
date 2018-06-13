@@ -1,4 +1,3 @@
-import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -7,7 +6,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -40,8 +38,7 @@ public class PLAFormTest {
     assertEquals("Prior Learning Assessment Request Form", element.getAttribute("innerHTML"));
   }
 
-  @Test
-  public void validFormSubmissionTest() {
+  private void fillFormWithValidDefaults(WebDriver webDriver) {
     WebElement studentid = webDriver.findElement(By.name("student-id"));
     studentid.sendKeys("123456789");
 
@@ -53,6 +50,9 @@ public class PLAFormTest {
 
     WebElement studentEmailInput = webDriver.findElement(By.name("student-email"));
     studentEmailInput.sendKeys("student@school.edu");
+
+    WebElement studentPhoneInput = webDriver.findElement(By.name("student-phone"));
+    studentPhoneInput.sendKeys("9987654321");
 
     WebElement internshipTitleInput = webDriver.findElement(By.name("internship-title"));
     internshipTitleInput.sendKeys("TestInternshipTitle");
@@ -98,18 +98,23 @@ public class PLAFormTest {
 
     WebElement reflection4Input = webDriver.findElement(By.name("reflection4"));
     reflection4Input.sendKeys("reflection4 TEST TEST TEST TEST");
+  }
 
-    dutiesDescriptionInput.submit();
+  @Test
+  public void validFormSubmissionTest() {
+    fillFormWithValidDefaults(webDriver);
+
+    webDriver.findElement(By.name("reflection4")).submit();
 
     final String expectedConfirmation = "Thank you for your submission!";
 
     (new WebDriverWait(webDriver, 10)).until(new ExpectedCondition<Boolean>() {
       public Boolean apply(WebDriver webDriver) {
         String entryViewLinkText = webDriver.findElement(By.tagName("a")).getText();
-        assertEquals("Click Here", entryViewLinkText);
-        return entryViewLinkText.equals("Click Here");
+        String expected = "Click Here";
+        assertEquals(expected, entryViewLinkText);
+        return entryViewLinkText.equals(expected);
       }
-
     });
   }
 
@@ -128,66 +133,17 @@ public class PLAFormTest {
 
   @Test
   public void startDateAfterEndDateTest() {
-    WebElement studentid = webDriver.findElement(By.name("student-id"));
-    studentid.sendKeys("123456789");
-
-    WebElement firstNameInput = webDriver.findElement(By.name("first-name"));
-    firstNameInput.sendKeys("TestFirstName");
-
-    WebElement lastNameInput = webDriver.findElement(By.name("last-name"));
-    lastNameInput.sendKeys("TestLastName");
-
-    WebElement studentEmailInput = webDriver.findElement(By.name("student-email"));
-    studentEmailInput.sendKeys("student@school.edu");
-
-    WebElement internshipTitleInput = webDriver.findElement(By.name("internship-title"));
-    internshipTitleInput.sendKeys("TestInternshipTitle");
-
-    WebElement companyInput = webDriver.findElement(By.name("company"));
-    companyInput.sendKeys("TestCompany");
+    fillFormWithValidDefaults(webDriver);
 
     WebElement startDateInput = webDriver.findElement(By.name("start-date"));
+    startDateInput.clear();
     startDateInput.sendKeys("2018-01-01");
 
     WebElement endDateInput = webDriver.findElement(By.name("end-date"));
+    endDateInput.clear();
     endDateInput.sendKeys("2017-12-31");
 
-    WebElement hoursWorkedInput = webDriver.findElement(By.name("hours-worked"));
-    hoursWorkedInput.sendKeys("10008");
-
-    WebElement supervisorNameInput = webDriver.findElement(By.name("supervisor-name"));
-    supervisorNameInput.sendKeys("TestSupervisorName");
-
-    WebElement supervisorTitleInput = webDriver.findElement(By.name("supervisor-title"));
-    supervisorTitleInput.sendKeys("Boss");
-
-    WebElement supervisorEmailInput = webDriver.findElement(By.name("supervisor-email"));
-    supervisorEmailInput.sendKeys("supervisor@work.biz");
-
-    WebElement supervisorPhoneInput = webDriver.findElement(By.name("supervisor-phone"));
-    supervisorPhoneInput.sendKeys("1234567899");
-
-    WebElement dutiesDescriptionInput = webDriver.findElement(By.name("duties-description"));
-    dutiesDescriptionInput.sendKeys("TEST TEST TEST TEST");
-
-    WebElement reflection0Input = webDriver.findElement(By.name("reflection0"));
-    reflection0Input.sendKeys("reflection0 TEST TEST TEST TEST");
-
-    WebElement reflection1Input = webDriver.findElement(By.name("reflection1"));
-    reflection1Input.sendKeys("reflection1 TEST TEST TEST TEST");
-
-    WebElement reflection2Input = webDriver.findElement(By.name("reflection2"));
-    reflection2Input.sendKeys("reflection2 TEST TEST TEST TEST");
-
-    WebElement reflection3Input = webDriver.findElement(By.name("reflection3"));
-    reflection3Input.sendKeys("reflection3 TEST TEST TEST TEST");
-
-    WebElement reflection4Input = webDriver.findElement(By.name("reflection4"));
-    reflection4Input.sendKeys("reflection4 TEST TEST TEST TEST");
-
-    dutiesDescriptionInput.submit();
-
-    final String expectedConfirmation = "Thank you for your submission!";
+    webDriver.findElement(By.name("reflection4")).submit();
 
     try {
       Thread.sleep(10000);
