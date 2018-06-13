@@ -2,6 +2,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -110,10 +111,16 @@ public class PLAFormTest {
 
     (new WebDriverWait(webDriver, 10)).until(new ExpectedCondition<Boolean>() {
       public Boolean apply(WebDriver webDriver) {
-        String entryViewLinkText = webDriver.findElement(By.tagName("a")).getText();
-        String expected = "Click Here";
-        assertEquals(expected, entryViewLinkText);
-        return entryViewLinkText.equals(expected);
+        boolean submissionConfirmed = false;
+        try {
+          String confirmationText = webDriver.findElement(By.id("confirmation")).getText();
+          submissionConfirmed = confirmationText.contains(expectedConfirmation);
+          assertTrue(submissionConfirmed);
+        } catch (NoSuchElementException exn) {
+          System.err.println(exn.getMessage());
+        } finally {
+          return submissionConfirmed;
+        }
       }
     });
   }
