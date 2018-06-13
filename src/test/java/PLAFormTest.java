@@ -50,7 +50,7 @@ public class PLAFormTest {
     lastNameInput.sendKeys("TestLastName");
 
     WebElement studentEmailInput = webDriver.findElement(By.name("student-email"));
-    studentEmailInput.sendKeys("student@school.edu");
+    studentEmailInput.sendKeys("msreedaran@mail.greenriver.edu");//"student@school.edu");
 
     WebElement studentPhoneInput = webDriver.findElement(By.name("student-phone"));
     studentPhoneInput.sendKeys("9987654321");
