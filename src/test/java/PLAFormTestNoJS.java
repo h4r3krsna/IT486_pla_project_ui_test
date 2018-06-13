@@ -103,21 +103,17 @@ public class PLAFormTestNoJS {
     webDriver.findElement(By.name("reflection4")).submit();
 
     final String expectedConfirmation = "Thank you for your submission!";
-
-    (new WebDriverWait(webDriver, 10)).until(new ExpectedCondition<Boolean>() {
-      public Boolean apply(WebDriver webDriver) {
-        boolean submissionConfirmed = false;
-        try {
-          String confirmationText = webDriver.findElement(By.id("confirmation")).getText();
-          submissionConfirmed = confirmationText.contains(expectedConfirmation);
-        } catch (NoSuchElementException exn) {
-          System.err.println(exn.getMessage());
-        } finally {
-          assertTrue(submissionConfirmed);
-          return submissionConfirmed;
-        }
-      }
-    });
+    boolean submissionConfirmed = false;
+    try { // TODO: replace with WebDriver wait
+      Thread.sleep(10000);
+      submissionConfirmed = webDriver.findElement(By.id("confirmation")).getText().contains(expectedConfirmation);
+    } catch (InterruptedException exn) {
+      System.err.println(exn.getMessage() + "\nBlank Form Submission Test thread interrupted!");
+    } catch (NoSuchElementException exn) {
+      System.err.println("No elements found with the class name \"validationError\"");
+    } finally {
+      assertTrue(submissionConfirmed);
+    }
   }
 
   @Test
