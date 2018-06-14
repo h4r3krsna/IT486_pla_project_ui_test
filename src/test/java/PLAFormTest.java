@@ -7,7 +7,9 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
@@ -20,15 +22,16 @@ public class PLAFormTest {
   WebDriver webDriver;
 
   final String EXPECTED_CONFIRMATION = "Thank you for your submission!";
+  final String CURRENT_ENVIRONMENT = "PROD";
 
   @Before
   public void goToStudentForm() {
-
     System.setProperty("webdriver.gecko.driver", GECKO_DRIVER_PATH);
+    Config.init();
 
     webDriver = new FirefoxDriver();
     webDriver.manage().window().maximize();
-    webDriver.get("http://msreedaran.greenrivertech.net/plaform");
+    webDriver.get(Config.get(CURRENT_ENVIRONMENT, "url"));
   }
 
   @Test
